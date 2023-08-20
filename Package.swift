@@ -22,8 +22,8 @@ let package = Package(
             .upToNextMajor(from: "1.0.0")
         ),
         .package(
-            name: "CommonUtils",
-            path:"../CommonUtils"
+            url: "https://github.com/msbahng/CommonUtils.git",
+            branch: "develop"
         ),
     ],
     targets: [
@@ -36,7 +36,7 @@ let package = Package(
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
                 .product(name: "Logger", package: "LoggeriOS"),
-                "CommonUtils"
+                .product(name: "CommonUtils", package: "CommonUtils")
             ]),
         .testTarget(
             name: "FirebaseUtilsTests",
