@@ -13,6 +13,11 @@ import CommonUtils
 
 public protocol FirestoreManagerProtocol {
     
+    func getReference (
+        collection: String,
+        document: String
+    ) -> DocumentReference
+    
     func deleteDocument (
         collection: String,
         document: String,
@@ -77,6 +82,13 @@ public struct FirestoreManager: FirestoreManagerProtocol {
     
     public init() {
         db = Firestore.firestore()
+    }
+    
+    public func getReference (
+        collection: String,
+        document: String
+    ) -> DocumentReference {
+        db.collection(collection).document(document)
     }
     
     public func deleteDocument (
