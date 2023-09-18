@@ -56,6 +56,11 @@ public protocol FirestoreManagerProtocol {
         completion: @escaping (Result<T, FirestoreError>) -> Void
     )
     
+    func getDocument<T: Codable> (
+        documentRef: DocumentReference,
+        completion: @escaping (Result<T, FirestoreError>) -> Void
+    )
+    
     func getData<T: Codable> (
         collection: String,
         whereField: (QueryType, String, Any)?,
@@ -239,7 +244,17 @@ public struct FirestoreManager: FirestoreManagerProtocol {
     ) {
         let docRef = db.collection(collection).document(document)
         
-        docRef.getDocument { (doc, error) in
+        getDocument(
+            documentRef: docRef,
+            completion: completion
+        )
+    }
+    
+    public func getDocument<T: Codable> (
+        documentRef: DocumentReference,
+        completion: @escaping (Result<T, FirestoreError>) -> Void
+    ) {
+        documentRef.getDocument { (doc, error) in
             if let doc = doc, doc.exists {
                 let dataDescription = doc.data().map(String.init(describing:)) ?? "nil"
                 Logger.printLog("Document data: \(dataDescription)")
