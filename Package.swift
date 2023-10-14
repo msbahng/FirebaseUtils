@@ -18,8 +18,9 @@ let package = Package(
             .upToNextMajor(from: "10.0.0")
         ),
         .package(
-            url:  "git@github.com:msbahng/LoggeriOS.git",
-            .upToNextMajor(from: "1.0.0")
+//            url:  "git@github.com:msbahng/LoggeriOS.git",
+//            .upToNextMajor(from: "1.0.0")
+            path: "../LoggeriOS"
         ),
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
