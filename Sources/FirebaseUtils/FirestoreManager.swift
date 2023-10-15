@@ -122,14 +122,12 @@ public struct FirestoreManager: FirestoreManagerProtocol {
         }
     }
     
-    @discardableResult
     public func getDocument<T: Codable> (collection: String, document: String) async throws -> T {
         
         let docRef = db.collection(collection).document(document)
         return try await getDocument(documentRef: docRef)
     }
     
-    @discardableResult
     public func getDocument<T: Codable> (documentRef: DocumentReference) async throws -> T {
         
         try await withCheckedThrowingContinuation { continuation in
@@ -177,7 +175,6 @@ public struct FirestoreManager: FirestoreManagerProtocol {
         }
     }
     
-    @discardableResult
     public func getData<T: Codable> (
         collection: String,
         whereField: (QueryType, String, Any)? = nil,

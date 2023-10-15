@@ -12,7 +12,7 @@ import Logger
 public protocol StorageManagerProtocol {
     func uploadFiles(
         files: [URL],
-        onProgress: ((Result<Float, Never>) -> Void)?
+        onProgress: ((Float) -> Void)?
     ) async throws -> [String]
 }
 
@@ -27,7 +27,7 @@ public struct StorageManager: StorageManagerProtocol {
     
     public func uploadFiles(
         files: [URL],
-        onProgress: ((Result<Float, Never>) -> Void)? = nil
+        onProgress: ((Float) -> Void)? = nil
     ) async throws -> [String] {
         
         guard files.count > 0 else {
@@ -42,12 +42,9 @@ public struct StorageManager: StorageManagerProtocol {
             let perFile = 1.0 / Float(files.count)
             
             for(index, localFile) in files.enumerated() {
-                let progress: (Result<Float, Never>) -> Void = { result in
-                    switch result {
-                    case .success(let ratio):
-                        let totalProgress = (Float(index) + ratio) * perFile
-                        onProgress?(.success(totalProgress))
-                    }
+                let progress: (Float) -> Void = { ratio in
+                    let totalProgress = (Float(index) + ratio) * perFile
+                    onProgress?(totalProgress)
                 }
                 
                 let name = try await processFile(file: localFile, storageRef: storageRef, onProgress: progress)
@@ -59,11 +56,14 @@ public struct StorageManager: StorageManagerProtocol {
         
         return names
     }
+}
+
+extension StorageManager {
     
     private func processFile(
         file: URL,
         storageRef: StorageReference,
-        onProgress: ((Result<Float, Never>) -> Void)? = nil
+        onProgress: ((Float) -> Void)? = nil
     ) async throws -> String {
         
         return try await withCheckedThrowingContinuation { continuation in
@@ -85,7 +85,7 @@ public struct StorageManager: StorageManagerProtocol {
     private func processFile(
         file: URL,
         storageRef: StorageReference,
-        onProgress: ((Result<Float, Never>) -> Void)?,
+        onProgress: ((Float) -> Void)?,
         onCompletion: @escaping (Result<String, StorageError>) -> Void
     ) {
         let fileRef = storageRef.child(file.lastPathComponent)
@@ -98,10 +98,10 @@ public struct StorageManager: StorageManagerProtocol {
             }
             
             let ratio = Float(progress.completedUnitCount) / Float(progress.totalUnitCount)
-            onProgress?(.success(ratio))
+            onProgress?(ratio)
         }
         
-        uploadTask.observe(.success) { snapshot in            
+        uploadTask.observe(.success) { snapshot in
             let name = snapshot.reference.name
             onCompletion(.success(name))
         }
@@ -127,4 +127,3 @@ public struct StorageManager: StorageManagerProtocol {
         }
     }
 }
-
