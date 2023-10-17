@@ -13,39 +13,39 @@ import CommonUtils
 
 public protocol FirestoreManagerProtocol {
     
-    func getReference (
+    static func getReference (
         collection: String,
         document: String
     ) -> DocumentReference
     
-    func setDocument<T: Codable> (
+    static func setDocument<T: Codable> (
         collection: String,
         document: String,
         data: T,
         merge: Bool
     ) async throws -> DocumentReference
     
-    func setDocument<T: Codable> (
+    static func setDocument<T: Codable> (
         collection: String,
         data: T
     ) async throws -> DocumentReference
     
-    func getDocument<T: Codable> (
+    static func getDocument<T: Codable> (
         collection: String,
         document: String
     ) async throws -> T
     
-    func getDocument<T: Codable> (
+    static func getDocument<T: Codable> (
         documentRef: DocumentReference
     ) async throws -> T
         
-    func deleteDocument (
+    static func deleteDocument (
         collection: String,
         document: String
     ) async throws -> Bool
     
             
-    func getData<T: Codable> (
+    static func getData<T: Codable> (
         collection: String,
         whereField: (QueryType, String, Any)?,
         orderBy: String?,
@@ -56,21 +56,16 @@ public protocol FirestoreManagerProtocol {
 
 public struct FirestoreManager: FirestoreManagerProtocol {
     
-    private let db: Firestore
-    
-    public init() {
-        db = Firestore.firestore()
-    }
-    
-    public func getReference (
+    public static func getReference (
         collection: String,
         document: String
     ) -> DocumentReference {
-        db.collection(collection).document(document)
+        let db = Firestore.firestore()
+        return db.collection(collection).document(document)
     }
     
     @discardableResult
-    public func setDocument<T: Codable> (
+    public static func setDocument<T: Codable> (
         collection: String,
         document: String,
         data: T,
@@ -78,7 +73,8 @@ public struct FirestoreManager: FirestoreManagerProtocol {
     ) async throws -> DocumentReference {
         
         try await withCheckedThrowingContinuation { continuation in
-            
+        
+            let db = Firestore.firestore()
             let ref = db.collection(collection).document(document)
             
             do {
@@ -98,7 +94,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
     }
             
     @discardableResult
-    public func setDocument<T: Codable> (
+    public static func setDocument<T: Codable> (
         collection: String,
         data: T
     ) async throws -> DocumentReference {
@@ -107,6 +103,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             
             var ref: DocumentReference?
             do {
+                let db = Firestore.firestore()
                 ref = try db.collection(collection).addDocument(from: data) { error in
                     if let error = error {
                         Logger.printLog("Error adding document: \(error)")
@@ -122,13 +119,14 @@ public struct FirestoreManager: FirestoreManagerProtocol {
         }
     }
     
-    public func getDocument<T: Codable> (collection: String, document: String) async throws -> T {
+    public static func getDocument<T: Codable> (collection: String, document: String) async throws -> T {
         
+        let db = Firestore.firestore()
         let docRef = db.collection(collection).document(document)
         return try await getDocument(documentRef: docRef)
     }
     
-    public func getDocument<T: Codable> (documentRef: DocumentReference) async throws -> T {
+    public static func getDocument<T: Codable> (documentRef: DocumentReference) async throws -> T {
         
         try await withCheckedThrowingContinuation { continuation in
             
@@ -154,13 +152,14 @@ public struct FirestoreManager: FirestoreManagerProtocol {
     }
     
     @discardableResult
-    public func deleteDocument (
+    public static func deleteDocument (
         collection: String,
         document: String
     ) async throws -> Bool {
         
         try await withCheckedThrowingContinuation { continuation in
             
+            let db = Firestore.firestore()
             let ref = db.collection(collection).document(document)
             
             ref.delete() { error in
@@ -175,7 +174,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
         }
     }
     
-    public func getData<T: Codable> (
+    public static func getData<T: Codable> (
         collection: String,
         whereField: (QueryType, String, Any)? = nil,
         orderBy: String? = nil,
@@ -184,6 +183,8 @@ public struct FirestoreManager: FirestoreManagerProtocol {
     ) async throws -> ([T], DocumentSnapshot?) {
         
         try await withCheckedThrowingContinuation { continuation in
+            
+            let db = Firestore.firestore()
             
             var query: Query?
             query = db.collection(collection)
