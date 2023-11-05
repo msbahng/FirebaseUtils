@@ -8,10 +8,12 @@
 import SwiftUI
 import Combine
 import FirebaseStorage
+import Logger
 
 final public class StorageLoader : ObservableObject {
     
     @Published public var data: Data?
+    @Published public var storageLoaderError: Error?
     
     private var cancelableSet = Set<AnyCancellable>()
     private let dataPublisher = PassthroughSubject<Data?, Never>()
@@ -28,7 +30,8 @@ final public class StorageLoader : ObservableObject {
         
         storageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
             if let error = error {
-                print("\(error)")
+                Logger.printLog("StorageLoader error : \(error)")
+                self.storageLoaderError = error
             }
             
             DispatchQueue.main.async {
