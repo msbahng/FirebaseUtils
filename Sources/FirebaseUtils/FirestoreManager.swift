@@ -44,10 +44,9 @@ public protocol FirestoreManagerProtocol {
         document: String
     ) async throws -> Bool
     
-            
     static func getData<T: Codable> (
         collection: String,
-        whereField: (QueryType, String, Any)?,
+        whereFields: [(QueryType, String, Any)],
         orderBy: String?,
         descending: Bool?,
         paging: Pagination?
@@ -176,7 +175,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
     
     public static func getData<T: Codable> (
         collection: String,
-        whereField: (QueryType, String, Any)? = nil,
+        whereFields: [(QueryType, String, Any)] = [],
         orderBy: String? = nil,
         descending: Bool? = true,
         paging: Pagination? = nil
@@ -189,12 +188,15 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             var query: Query?
             query = db.collection(collection)
             
-            if let whereField = whereField {
+            for whereField in whereFields {
+            
                 switch whereField.0 {
                 case .equalTo:
                     query = query?.whereField(whereField.1, isEqualTo: whereField.2)
-                }
-                
+                    
+                case .notEqualTo:
+                    query = query?.whereField(whereField.1, isNotEqualTo: whereField.2)
+                } 
             }
             
             if let paging = paging {
