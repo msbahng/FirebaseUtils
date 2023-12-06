@@ -51,6 +51,10 @@ public protocol FirestoreManagerProtocol {
         descending: Bool?,
         paging: Pagination?
     ) async throws -> ([T], DocumentSnapshot?)
+    
+    static func getDataFromDocumentRefs<T: Codable> (
+        documentRefs: [DocumentReference]
+    ) async throws -> [T]
 }
 
 public struct FirestoreManager: FirestoreManagerProtocol {
@@ -222,7 +226,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                 } else {
                     var list: [T] = []
                     for doc in querySnapshot!.documents {
-                        Logger.printLog("\(doc.documentID) => \(doc.data())")
+//                        Logger.printLog("\(doc.documentID) => \(doc.data())")
                         do {
                             let data = try doc.data(as: T.self)
                             list.append(data)
@@ -237,6 +241,26 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                     continuation.resume(returning: (list, last))
                 }
             }
+        }
+    }
+    
+    public static func getDataFromDocumentRefs<T: Codable> (
+        documentRefs: [DocumentReference]
+    ) async throws -> [T] {
+        
+        try await withThrowingTaskGroup(of: (Int, T).self) { group in
+            for documentRef in documentRefs.enumerated() {
+                group.addTask {
+                    (documentRef.offset, try await Self.getDocument(documentRef: documentRef.element))
+                }
+            }
+            
+            var list = [T]()
+            for try await (_, item) in group {
+                list.append(item)
+            }
+            
+            return list
         }
     }
 }
