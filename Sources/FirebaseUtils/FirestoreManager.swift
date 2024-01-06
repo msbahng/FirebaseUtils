@@ -255,12 +255,10 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                 }
             }
             
-            var list = [T]()
-            for try await (_, item) in group {
-                list.append(item)
-            }
-            
-            return list
+            return try await group
+                .reduce(into: []) { $0.append($1) }
+                .sorted { $0.0 < $1.0 }
+                .map { $0.1 }
         }
     }
 }
