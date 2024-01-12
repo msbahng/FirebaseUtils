@@ -84,7 +84,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                 try ref.setData(from: data, merge: merge) { error in
                     if let error = error {
                         Logger.printLog("Error adding document: \(error)")
-                        continuation.resume(throwing: error)
+                        continuation.resume(throwing: FirestoreError.document(error.localizedDescription))
                     } else {
                         Logger.printLog("Document set : \(document)")
                         continuation.resume(returning: ref)
@@ -110,7 +110,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                 ref = try db.collection(collection).addDocument(from: data) { error in
                     if let error = error {
                         Logger.printLog("Error adding document: \(error)")
-                        continuation.resume(throwing: error)
+                        continuation.resume(throwing: FirestoreError.document(error.localizedDescription))
                     } else {
                         Logger.printLog("Document added with ID: \(ref!.documentID)")
                         continuation.resume(returning: ref!)
@@ -143,12 +143,12 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                         continuation.resume(returning: data)
                     } catch {
                         Logger.printLog("Error parsing documents: \(error)")
-                        continuation.resume(throwing: error)
+                        continuation.resume(throwing: FirestoreError.parsing)
                     }
                     
                 } else {
                     Logger.printLog("Document does not exist")
-                    continuation.resume(throwing: FirestoreError.document)
+                    continuation.resume(throwing: FirestoreError.document("Document does not exist."))
                 }
             }
         }
@@ -168,7 +168,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             ref.delete() { error in
                 if let error = error {
                     Logger.printLog("Error deleting document: \(error)")
-                    continuation.resume(throwing: error)
+                    continuation.resume(throwing: FirestoreError.document(error.localizedDescription))
                 } else {
                     Logger.printLog("Document deleted")
                     continuation.resume(returning: true)
@@ -222,7 +222,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             query?.getDocuments() { (querySnapshot, err) in
                 if let err = err {
                     Logger.printLog("Error getting documents: \(err)")
-                    continuation.resume(throwing: FirestoreError.document)
+                    continuation.resume(throwing: FirestoreError.document(err.localizedDescription))
                 } else {
                     var list: [T] = []
                     for doc in querySnapshot!.documents {

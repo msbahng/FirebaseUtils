@@ -1,6 +1,6 @@
 //
 //  StorageManager.swift
-//  grourmet
+//  gourmet
 //
 //  Created by Mooseok Bahng on 2023/06/25.
 //

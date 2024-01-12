@@ -10,22 +10,22 @@ import Foundation
 public enum FirestoreError: Error {
     
     case unauthorized
-    case document
+    case document(_ message: String?)
     case parsing
     case no_id
     case unknown
     
-    var message: String {
+    public var message: String {
         switch self {
             
         case .unauthorized:
             return "Login needed."
                         
-        case .document:
-            return "Database error."
+        case .document(let message):
+            return message ?? "Database error."
             
         case .parsing:
-            return "Firestore parsing error."
+            return "Data parsing error."
             
         case .no_id:
             return "Invalid object(There is no id)."
