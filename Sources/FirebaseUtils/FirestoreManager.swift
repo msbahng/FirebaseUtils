@@ -200,11 +200,11 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                     
                 case .notEqualTo:
                     query = query?.whereField(whereField.1, isNotEqualTo: whereField.2)
+                    query = query?.order(by: whereField.1, descending: true)
                     
                 case .arrayContains:
                     query = query?.whereField(whereField.1, arrayContains: whereField.2)
                 }
-                
             }
             
             if let paging = paging {

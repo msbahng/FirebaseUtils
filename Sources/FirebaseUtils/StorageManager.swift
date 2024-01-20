@@ -12,8 +12,11 @@ import Logger
 public protocol StorageManagerProtocol {
     func uploadFiles(
         files: [URL],
+        folder: String,
         onProgress: ((Float) -> Void)?
     ) async throws -> [String]
+    
+    func deleteFile(_ firebaseFile: String) async throws
 }
 
 public struct StorageManager: StorageManagerProtocol {
@@ -27,6 +30,7 @@ public struct StorageManager: StorageManagerProtocol {
     
     public func uploadFiles(
         files: [URL],
+        folder: String,
         onProgress: ((Float) -> Void)? = nil
     ) async throws -> [String] {
         
@@ -34,8 +38,7 @@ public struct StorageManager: StorageManagerProtocol {
             return []
         }
         
-        let uuid = UUID()
-        let storageRef = self.imageStorageRef.child(uuid.uuidString)
+        let storageRef = self.imageStorageRef.child(folder)
         var names = [String]()
         
         do {
@@ -47,14 +50,20 @@ public struct StorageManager: StorageManagerProtocol {
                     onProgress?(totalProgress)
                 }
                 
-                let name = try await processFile(file: localFile, storageRef: storageRef, onProgress: progress)
-                names.append("\(uuid.uuidString)/\(name)")
+                let fullPath = try await processFile(file: localFile, storageRef: storageRef, onProgress: progress)
+                names.append(fullPath)
             }
         } catch {
             throw error
         }
         
         return names
+    }
+    
+    public func deleteFile(_ firebaseFile: String) async throws {
+        
+        let fileRef = self.imageStorageRef.child("test")
+        try await fileRef.delete()
     }
 }
 
@@ -102,8 +111,8 @@ extension StorageManager {
         }
         
         uploadTask.observe(.success) { snapshot in
-            let name = snapshot.reference.name
-            onCompletion(.success(name))
+            let fullPath = snapshot.reference.fullPath
+            onCompletion(.success(fullPath))
         }
         
         uploadTask.observe(.failure) { snapshot in
