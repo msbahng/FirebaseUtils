@@ -12,7 +12,7 @@
     {
       "identity" : "commonutils",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/msbahng/CommonUtils.git",
+      "location" : "git@github.com:msbahng/CommonUtils.git",
       "state" : {
         "branch" : "develop",
         "revision" : "bf4b6839d88692d63f374d96a648a1dae7e1cc1f"
@@ -84,7 +84,7 @@
     {
       "identity" : "loggerios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/msbahng/LoggeriOS.git",
+      "location" : "git@github.com:msbahng/LoggeriOS.git",
       "state" : {
         "revision" : "e9c8f51c6cf528f476b35eb71a8f18d27eb881bf",
         "version" : "1.0.0"
