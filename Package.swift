@@ -25,6 +25,7 @@ let package = Package(
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
             branch: "develop"
+//            path: "../CommonUtils"
         ),
     ],
     targets: [
