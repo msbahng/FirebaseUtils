@@ -22,10 +22,12 @@ public protocol StorageManagerProtocol {
 public struct StorageManager: StorageManagerProtocol {
     
     private let imageStorageRef: StorageReference
+    private let storageRef: StorageReference
     
-    public init(storageReferenceUrl: String) {
+    public init(storageUrl: String, path: String) {
         let storage = Storage.storage()
-        imageStorageRef = storage.reference(forURL: storageReferenceUrl)
+        storageRef = storage.reference(forURL: storageUrl)
+        imageStorageRef = storageRef.child(path)
     }
     
     public func uploadFiles(
@@ -62,7 +64,7 @@ public struct StorageManager: StorageManagerProtocol {
     
     public func deleteFile(_ firebaseFile: String) async throws {
         
-        let fileRef = self.imageStorageRef.child("test")
+        let fileRef = storageRef.child(firebaseFile)
         try await fileRef.delete()
     }
 }
