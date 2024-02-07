@@ -52,6 +52,11 @@ public protocol FirestoreManagerProtocol {
         paging: Pagination?
     ) async throws -> ([T], DocumentSnapshot?)
     
+    static func getCount (
+        collection: String,
+        whereFields: [(QueryType, String, Any)]
+    ) async throws -> Int
+    
     static func getDataFromDocumentRefs<T: Codable> (
         documentRefs: [DocumentReference]
     ) async throws -> [T]
@@ -187,37 +192,13 @@ public struct FirestoreManager: FirestoreManagerProtocol {
         
         try await withCheckedThrowingContinuation { continuation in
             
-            let db = Firestore.firestore()
-            
-            var query: Query?
-            query = db.collection(collection)
-            
-            for whereField in whereFields {
-            
-                switch whereField.0 {
-                case .equalTo:
-                    query = query?.whereField(whereField.1, isEqualTo: whereField.2)
-                    
-                case .notEqualTo:
-                    query = query?.whereField(whereField.1, isNotEqualTo: whereField.2)
-                    query = query?.order(by: whereField.1, descending: true)
-                    
-                case .arrayContains:
-                    query = query?.whereField(whereField.1, arrayContains: whereField.2)
-                }
-            }
-            
-            if let paging = paging {
-                query = query?.limit(to: paging.limit ?? 20)
-            }
-            
-            if let orderBy = orderBy {
-                query = query?.order(by: orderBy, descending: descending ?? true)
-            }
-            
-            if let last = paging?.last {
-                query = query?.start(afterDocument: last)
-            }
+            let query = Self.getQuery(
+                collection: collection,
+                whereFields: whereFields,
+                orderBy: orderBy,
+                descending: descending,
+                paging: paging
+            )
             
             query?.getDocuments() { (querySnapshot, err) in
                 if let err = err {
@@ -244,6 +225,29 @@ public struct FirestoreManager: FirestoreManagerProtocol {
         }
     }
     
+    public static func getCount (
+        collection: String,
+        whereFields: [(QueryType, String, Any)] = []
+    ) async throws -> Int {
+        
+        try await withCheckedThrowingContinuation { continuation in
+            
+            let query = Self.getQuery(
+                collection: collection,
+                whereFields: whereFields
+            )
+            
+            query?.getDocuments() { (querySnapshot, err) in
+                if let err = err {
+                    Logger.printLog("Error getting documents: \(err)")
+                    continuation.resume(throwing: FirestoreError.document(err.localizedDescription))
+                } else {
+                    continuation.resume(returning: querySnapshot?.count ?? 0)
+                }
+            }
+        }
+    }
+    
     public static func getDataFromDocumentRefs<T: Codable> (
         documentRefs: [DocumentReference]
     ) async throws -> [T] {
@@ -260,5 +264,51 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                 .sorted { $0.0 < $1.0 }
                 .map { $0.1 }
         }
+    }
+}
+
+extension FirestoreManager {
+    
+    private static func getQuery(
+        collection: String,
+        whereFields: [(QueryType, String, Any)] = [],
+        orderBy: String? = nil,
+        descending: Bool? = true,
+        paging: Pagination? = nil
+    ) -> Query? {
+        
+        let db = Firestore.firestore()
+        
+        var query: Query?
+        query = db.collection(collection)
+        
+        for whereField in whereFields {
+        
+            switch whereField.0 {
+            case .equalTo:
+                query = query?.whereField(whereField.1, isEqualTo: whereField.2)
+                
+            case .notEqualTo:
+                query = query?.whereField(whereField.1, isNotEqualTo: whereField.2)
+                query = query?.order(by: whereField.1, descending: true)
+                
+            case .arrayContains:
+                query = query?.whereField(whereField.1, arrayContains: whereField.2)
+            }
+        }
+        
+        if let paging = paging {
+            query = query?.limit(to: paging.limit ?? 20)
+        }
+        
+        if let orderBy = orderBy {
+            query = query?.order(by: orderBy, descending: descending ?? true)
+        }
+        
+        if let last = paging?.last {
+            query = query?.start(afterDocument: last)
+        }
+        
+        return query
     }
 }
