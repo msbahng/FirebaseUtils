@@ -15,6 +15,7 @@ import Logger
     public var data: Data?
     public var storageLoaderError: Error?
     
+    // not used for now
     public init(storageReferenceUrl: String, id: String) {
                 
         let storageRef = Self.getStorageReference(storageReferenceUrl: storageReferenceUrl, id: id)
@@ -34,7 +35,7 @@ import Logger
         let localUrl = localBaseUrl.appendingPathComponent(id)
         
         guard !FileManager.default.fileExists(atPath: localUrl.path) else {
-            self.localUrl = localUrl
+            self.localUrl = localUrl            // cache exists
             return
         }
         
