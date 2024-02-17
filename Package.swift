@@ -1,11 +1,11 @@
-// swift-tools-version: 5.8
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "FirebaseUtils",
-    platforms: [.iOS(.v15)],
+    platforms: [.iOS(.v17)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -18,12 +18,14 @@ let package = Package(
             .upToNextMajor(from: "10.0.0")
         ),
         .package(
-            url:  "https://github.com/msbahng/LoggeriOS.git",
+            url:  "git@github.com:msbahng/LoggeriOS.git",
             .upToNextMajor(from: "1.0.0")
+//            path: "../LoggeriOS"
         ),
         .package(
-            name: "CommonUtils",
-            path:"../CommonUtils"
+            url: "git@github.com:msbahng/CommonUtils.git",
+            branch: "develop"
+//            path: "../CommonUtils"
         ),
     ],
     targets: [
@@ -36,7 +38,7 @@ let package = Package(
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
                 .product(name: "Logger", package: "LoggeriOS"),
-                "CommonUtils"
+                .product(name: "CommonUtils", package: "CommonUtils")
             ]),
         .testTarget(
             name: "FirebaseUtilsTests",

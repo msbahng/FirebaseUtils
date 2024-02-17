@@ -13,153 +13,67 @@ import CommonUtils
 
 public protocol FirestoreManagerProtocol {
     
-    func deleteDocument (
-        collection: String,
-        document: String,
-        completion: @escaping (Result<Void, FirestoreError>) -> Void
-    )
-    
-    func setDocument<T: Codable> (
-        collection: String,
-        document: String,
-        data: T,
-        merge: Bool,
-        completion: @escaping (Result<DocumentReference, FirestoreError>) -> Void
-    )
-    
-    func setDocument<T: Codable> (
-        collection: String,
-        data: T,
-        completion: @escaping (Result<DocumentReference, FirestoreError>) -> Void
-    )
-    
-    func deleteDocument (
+    static func getReference (
         collection: String,
         document: String
-    ) async throws -> Void
+    ) -> DocumentReference
     
-    func setDocument<T: Codable> (
+    static func setDocument<T: Codable> (
         collection: String,
         document: String,
         data: T,
         merge: Bool
     ) async throws -> DocumentReference
     
-    func setDocument<T: Codable> (
+    static func setDocument<T: Codable> (
         collection: String,
         data: T
     ) async throws -> DocumentReference
     
-    func getDocument<T: Codable> (
+    static func getDocument<T: Codable> (
         collection: String,
-        document: String,
-        completion: @escaping (Result<T, FirestoreError>) -> Void
-    )
+        document: String
+    ) async throws -> T
     
-    func getData<T: Codable> (
+    static func getDocument<T: Codable> (
+        documentRef: DocumentReference
+    ) async throws -> T
+        
+    static func deleteDocument (
         collection: String,
-        whereField: (QueryType, String, Any)?,
+        document: String
+    ) async throws -> Bool
+    
+    static func getData<T: Codable> (
+        collection: String,
+        whereFields: [(QueryType, String, Any)],
         orderBy: String?,
         descending: Bool?,
-        paging: Pagination?,
-        completion: @escaping (Result<([T], DocumentSnapshot?), FirestoreError>) -> Void
-    )
+        paging: Pagination?
+    ) async throws -> ([T], DocumentSnapshot?)
+    
+    static func getCount (
+        collection: String,
+        whereFields: [(QueryType, String, Any)]
+    ) async throws -> Int
+    
+    static func getDataFromDocumentRefs<T: Codable> (
+        documentRefs: [DocumentReference]
+    ) async throws -> [T]
 }
 
 public struct FirestoreManager: FirestoreManagerProtocol {
     
-    private let db: Firestore
-    
-    public init() {
-        db = Firestore.firestore()
-    }
-    
-    public func deleteDocument (
-        collection: String,
-        document: String,
-        completion: @escaping (Result<Void, FirestoreError>) -> Void
-    ) {
-        let ref = db.collection(collection).document(document)
-        
-        ref.delete() { error in
-            if let error = error {
-                Logger.printLog("Error deleting document: \(error)")
-                completion(.failure(.document))
-            } else {
-                Logger.printLog("Document deleted")
-                completion(.success(Void()))
-            }
-        }
-    }
-    
-    public func setDocument<T: Codable> (
-        collection: String,
-        document: String,
-        data: T,
-        merge: Bool = false,
-        completion: @escaping (Result<DocumentReference, FirestoreError>) -> Void
-    ) {
-        let ref = db.collection(collection).document(document)
-        
-        do {
-            try ref.setData(from: data, merge: merge) { error in
-                if let error = error {
-                    Logger.printLog("Error adding document: \(error)")
-                    completion(.failure(.document))
-                } else {
-                    Logger.printLog("Document set : \(document)")
-                    completion(.success(ref))
-                }
-            }
-        } catch {
-            completion(.failure(.parsing))
-        }
-    }
-    
-    public func setDocument<T: Codable> (
-        collection: String,
-        data: T,
-        completion: @escaping (Result<DocumentReference, FirestoreError>) -> Void
-    ) {
-        var ref: DocumentReference?
-        do {
-            ref = try db.collection(collection).addDocument(from: data) { error in
-                if let error = error {
-                    Logger.printLog("Error adding document: \(error)")
-                    completion(.failure(.document))
-                } else {
-                    Logger.printLog("Document added with ID: \(ref!.documentID)")
-                    completion(.success(ref!))
-                }
-            }
-        } catch {
-            completion(.failure(.parsing))
-        }
-    }
-    
-    public func deleteDocument (
+    public static func getReference (
         collection: String,
         document: String
-    ) async throws -> Void {
-        
-        try await withCheckedThrowingContinuation { continuation in
-            deleteDocument(
-                collection: collection,
-                document: document,
-                completion: { result in
-                    switch result {
-                    case .success():
-                        continuation.resume()
-                        
-                    case .failure(let error):
-                        continuation.resume(throwing: error)
-                    }
-                })
-        }
+    ) -> DocumentReference {
+        let db = Firestore.firestore()
+        return db.collection(collection).document(document)
     }
     
     @discardableResult
-    public func setDocument<T: Codable> (
+    public static func setDocument<T: Codable> (
         collection: String,
         document: String,
         data: T,
@@ -167,115 +81,220 @@ public struct FirestoreManager: FirestoreManagerProtocol {
     ) async throws -> DocumentReference {
         
         try await withCheckedThrowingContinuation { continuation in
-            setDocument(
-                collection: collection,
-                document: document,
-                data: data,
-                merge: merge,
-                completion: { result in
-                    switch result {
-                    case .success(let documentRef):
-                        continuation.resume(returning: documentRef)
-                        
-                    case .failure(let error):
-                        continuation.resume(throwing: error)
+        
+            let db = Firestore.firestore()
+            let ref = db.collection(collection).document(document)
+            
+            do {
+                try ref.setData(from: data, merge: merge) { error in
+                    if let error = error {
+                        Logger.printLog("Error adding document: \(error)")
+                        continuation.resume(throwing: FirestoreError.document(error.localizedDescription))
+                    } else {
+                        Logger.printLog("Document set : \(document)")
+                        continuation.resume(returning: ref)
                     }
-                })
+                }
+            } catch {
+                continuation.resume(throwing: FirestoreError.parsing)
+            }
         }
     }
-    
+            
     @discardableResult
-    public func setDocument<T: Codable> (
+    public static func setDocument<T: Codable> (
         collection: String,
         data: T
     ) async throws -> DocumentReference {
         
         try await withCheckedThrowingContinuation { continuation in
-            setDocument(
-                collection: collection,
-                data: data,
-                completion: { result in
-                    switch result {
-                    case .success(let documentRef):
-                        continuation.resume(returning: documentRef)
-                        
-                    case .failure(let error):
-                        continuation.resume(throwing: error)
+            
+            var ref: DocumentReference?
+            do {
+                let db = Firestore.firestore()
+                ref = try db.collection(collection).addDocument(from: data) { error in
+                    if let error = error {
+                        Logger.printLog("Error adding document: \(error)")
+                        continuation.resume(throwing: FirestoreError.document(error.localizedDescription))
+                    } else {
+                        Logger.printLog("Document added with ID: \(ref!.documentID)")
+                        continuation.resume(returning: ref!)
                     }
-                })
+                }
+            } catch {
+                continuation.resume(throwing: FirestoreError.parsing)
+            }
+        }
+    }
+    
+    public static func getDocument<T: Codable> (collection: String, document: String) async throws -> T {
+        
+        let db = Firestore.firestore()
+        let docRef = db.collection(collection).document(document)
+        return try await getDocument(documentRef: docRef)
+    }
+    
+    public static func getDocument<T: Codable> (documentRef: DocumentReference) async throws -> T {
+        
+        try await withCheckedThrowingContinuation { continuation in
+            
+            documentRef.getDocument { (doc, error) in
+                if let doc = doc, doc.exists {
+                    let dataDescription = doc.data().map(String.init(describing:)) ?? "nil"
+                    Logger.printLog("Document data: \(dataDescription)")
+                    
+                    do {
+                        let data = try doc.data(as: T.self)
+                        continuation.resume(returning: data)
+                    } catch {
+                        Logger.printLog("Error parsing documents: \(error)")
+                        continuation.resume(throwing: FirestoreError.parsing)
+                    }
+                    
+                } else {
+                    Logger.printLog("Document does not exist")
+                    continuation.resume(throwing: FirestoreError.document("Document does not exist."))
+                }
+            }
         }
     }
     
     @discardableResult
-    public func getDocument<T: Codable> (
+    public static func deleteDocument (
         collection: String,
         document: String
-    ) async throws -> T {
+    ) async throws -> Bool {
         
         try await withCheckedThrowingContinuation { continuation in
             
-            let completion: (Result<T, FirestoreError>) -> Void = { result in
-                switch result {
-                case .success(let data):
-                    continuation.resume(returning: data)
+            let db = Firestore.firestore()
+            let ref = db.collection(collection).document(document)
+            
+            ref.delete() { error in
+                if let error = error {
+                    Logger.printLog("Error deleting document: \(error)")
+                    continuation.resume(throwing: FirestoreError.document(error.localizedDescription))
+                } else {
+                    Logger.printLog("Document deleted")
+                    continuation.resume(returning: true)
+                }
+            }
+        }
+    }
+    
+    public static func getData<T: Codable> (
+        collection: String,
+        whereFields: [(QueryType, String, Any)] = [],
+        orderBy: String? = nil,
+        descending: Bool? = true,
+        paging: Pagination? = nil
+    ) async throws -> ([T], DocumentSnapshot?) {
+        
+        try await withCheckedThrowingContinuation { continuation in
+            
+            let query = Self.getQuery(
+                collection: collection,
+                whereFields: whereFields,
+                orderBy: orderBy,
+                descending: descending,
+                paging: paging
+            )
+            
+            query?.getDocuments() { (querySnapshot, err) in
+                if let err = err {
+                    Logger.printLog("Error getting documents: \(err)")
+                    continuation.resume(throwing: FirestoreError.document(err.localizedDescription))
+                } else {
+                    var list: [T] = []
+                    for doc in querySnapshot!.documents {
+//                        Logger.printLog("\(doc.documentID) => \(doc.data())")
+                        do {
+                            let data = try doc.data(as: T.self)
+                            list.append(data)
+                        } catch {
+                            Logger.printLog("Error parsing documents: \(error)")
+                            continuation.resume(throwing: FirestoreError.parsing)
+                        }
+                    }
                     
-                case .failure(let error):
-                    continuation.resume(throwing: error)
+                    let last = querySnapshot?.documents.last
+                    
+                    continuation.resume(returning: (list, last))
+                }
+            }
+        }
+    }
+    
+    public static func getCount (
+        collection: String,
+        whereFields: [(QueryType, String, Any)] = []
+    ) async throws -> Int {
+        
+        try await withCheckedThrowingContinuation { continuation in
+            
+            let query = Self.getQuery(
+                collection: collection,
+                whereFields: whereFields
+            )
+            
+            query?.getDocuments() { (querySnapshot, err) in
+                if let err = err {
+                    Logger.printLog("Error getting documents: \(err)")
+                    continuation.resume(throwing: FirestoreError.document(err.localizedDescription))
+                } else {
+                    continuation.resume(returning: querySnapshot?.count ?? 0)
+                }
+            }
+        }
+    }
+    
+    public static func getDataFromDocumentRefs<T: Codable> (
+        documentRefs: [DocumentReference]
+    ) async throws -> [T] {
+        
+        try await withThrowingTaskGroup(of: (Int, T).self) { group in
+            for documentRef in documentRefs.enumerated() {
+                group.addTask {
+                    (documentRef.offset, try await Self.getDocument(documentRef: documentRef.element))
                 }
             }
             
-            getDocument (
-                collection: collection,
-                document: document,
-                completion: completion
-            )
+            return try await group
+                .reduce(into: []) { $0.append($1) }
+                .sorted { $0.0 < $1.0 }
+                .map { $0.1 }
         }
     }
+}
+
+extension FirestoreManager {
     
-    public func getDocument<T: Codable> (
+    private static func getQuery(
         collection: String,
-        document: String,
-        completion: @escaping (Result<T, FirestoreError>) -> Void
-    ) {
-        let docRef = db.collection(collection).document(document)
-        
-        docRef.getDocument { (doc, error) in
-            if let doc = doc, doc.exists {
-                let dataDescription = doc.data().map(String.init(describing:)) ?? "nil"
-                Logger.printLog("Document data: \(dataDescription)")
-                
-                do {
-                    let data = try doc.data(as: T.self)
-                    completion(.success(data))
-                } catch {
-                    Logger.printLog("Error parsing documents: \(error)")
-                    completion(.failure(.parsing))
-                }
-                
-            } else {
-                Logger.printLog("Document does not exist")
-                completion(.failure(.document))
-            }
-        }
-    }
-    
-    public func getData<T: Codable> (
-        collection: String,
-        whereField: (QueryType, String, Any)? = nil,
+        whereFields: [(QueryType, String, Any)] = [],
         orderBy: String? = nil,
         descending: Bool? = true,
-        paging: Pagination? = nil,
-        completion: @escaping (Result<([T], DocumentSnapshot?), FirestoreError>) -> Void
-    ) {
+        paging: Pagination? = nil
+    ) -> Query? {
+        
+        let db = Firestore.firestore()
+        
         var query: Query?
         query = db.collection(collection)
         
-        if let whereField = whereField {
+        for whereField in whereFields {
+        
             switch whereField.0 {
             case .equalTo:
                 query = query?.whereField(whereField.1, isEqualTo: whereField.2)
+                
+            case .notEqualTo:
+                query = query?.whereField(whereField.1, isNotEqualTo: whereField.2)
+                query = query?.order(by: whereField.1, descending: true)
+                
+            case .arrayContains:
+                query = query?.whereField(whereField.1, arrayContains: whereField.2)
             }
-            
         }
         
         if let paging = paging {
@@ -290,51 +309,6 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             query = query?.start(afterDocument: last)
         }
         
-        query?.getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                Logger.printLog("Error getting documents: \(err)")
-                completion(.failure(.document))
-            } else {
-                var list: [T] = []
-                for doc in querySnapshot!.documents {
-                    Logger.printLog("\(doc.documentID) => \(doc.data())")
-                    do {
-                        let data = try doc.data(as: T.self)
-                        list.append(data)
-                    } catch {
-                        Logger.printLog("Error parsing documents: \(error)")
-                        completion(.failure(.parsing))
-                    }
-                }
-                
-                let last = querySnapshot?.documents.last
-                
-                completion(.success((list, last)))
-            }
-        }
+        return query
     }
 }
-
-//extension FirestoreManager {
-//
-//    private func addData<T: Codable> (
-//        collection: String,
-//        data: T,
-//        completion: @escaping (Result<DocumentReference, FirestoreError>) -> Void
-//    ) {
-//        var ref: DocumentReference?
-//        do {
-//            ref = try db.collection(collection).addDocument(from: data) { error in
-//                if let error = error {
-//                    Logger.printLog("Error adding document: \(error)")
-//                    completion(.failure(.document))
-//                } else {
-//                    Logger.printLog("Document added with ID: \(ref!.documentID)")
-//                    completion(.success(ref!))
-//                }
-//            }
-//        } catch {
-//            completion(.failure(.parsing))
-//        }
-//    }
-//}

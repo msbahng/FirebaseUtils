@@ -9,4 +9,6 @@ import Foundation
 
 public enum QueryType {
     case equalTo
+    case notEqualTo
+    case arrayContains
 }

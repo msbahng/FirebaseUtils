@@ -14,7 +14,7 @@ public struct Pagination {
     
     public var last: DocumentSnapshot? {
         didSet {
-            if oldValue == last {
+            if last == nil {
                 noMoreData = true
             } else {
                 noMoreData = false
