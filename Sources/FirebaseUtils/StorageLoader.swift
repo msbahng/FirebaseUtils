@@ -14,6 +14,7 @@ import Logger
     public var localUrl: URL?
     public var data: Data?
     public var storageLoaderError: Error?
+    public var isLoading: Bool = false
     
     // not used for now
     public init(storageReferenceUrl: String, id: String) {
@@ -39,6 +40,8 @@ import Logger
             return
         }
         
+        isLoading = true
+        
         let storageRef = Self.getStorageReference(storageReferenceUrl: storageReferenceUrl, id: id)
         
         storageRef.write(toFile: localUrl) { [weak self] url, error in
@@ -48,6 +51,7 @@ import Logger
             }
             
             self?.localUrl = url
+            self?.isLoading = false
         }
     }
     
