@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:msbahng/CommonUtils.git",
       "state" : {
-        "revision" : "f7b9b8e40795dae618cef1700d70cf7eb6c1d264",
-        "version" : "1.0.0"
+        "revision" : "d7c8d828b06208cc5ef97f76cd1873fa016239be",
+        "version" : "1.0.1"
       }
     },
     {
@@ -86,7 +86,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:msbahng/LoggeriOS.git",
       "state" : {
-        "revision" : "e9c8f51c6cf528f476b35eb71a8f18d27eb881bf",
+        "revision" : "08954426ebf246925eb1de44bf095c959f89f254",
         "version" : "1.0.0"
       }
     },

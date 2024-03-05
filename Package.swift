@@ -24,7 +24,7 @@ let package = Package(
         ),
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
-            .exact("1.0.0")
+            .exact("1.0.1")
 //            path: "../CommonUtils"
         ),
     ],
