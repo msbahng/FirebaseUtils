@@ -294,6 +294,13 @@ extension FirestoreManager {
                 
             case .arrayContains:
                 query = query?.whereField(whereField.1, arrayContains: whereField.2)
+                
+            case .search:
+                if let searchText = whereField.2 as? String {
+                    query = query?.whereField(whereField.1, isGreaterThanOrEqualTo: searchText)
+                    query = query?.whereField(whereField.1, isLessThanOrEqualTo: searchText + "\u{F7FF}")
+                    query = query?.limit(to: 50)        // search limit : 50
+                }
             }
         }
         
