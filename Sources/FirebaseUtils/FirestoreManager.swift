@@ -49,7 +49,8 @@ public protocol FirestoreManagerProtocol {
         whereFields: [(QueryType, String, Any)],
         orderBy: String?,
         descending: Bool?,
-        paging: Pagination?
+        paging: Pagination?,
+        limit: Int?
     ) async throws -> ([T], DocumentSnapshot?)
     
     static func getCount (
@@ -59,6 +60,13 @@ public protocol FirestoreManagerProtocol {
     
     static func getDataFromDocumentRefs<T: Codable> (
         documentRefs: [DocumentReference]
+    ) async throws -> [T]
+    
+    static func getDataInDay<T: Codable> (
+        collection: String,
+        date: Date,
+        dateField: String,
+        timeZone: TimeZone
     ) async throws -> [T]
 }
 
@@ -187,7 +195,8 @@ public struct FirestoreManager: FirestoreManagerProtocol {
         whereFields: [(QueryType, String, Any)] = [],
         orderBy: String? = nil,
         descending: Bool? = true,
-        paging: Pagination? = nil
+        paging: Pagination? = nil,
+        limit: Int? = nil
     ) async throws -> ([T], DocumentSnapshot?) {
         
         try await withCheckedThrowingContinuation { continuation in
@@ -197,13 +206,15 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                 whereFields: whereFields,
                 orderBy: orderBy,
                 descending: descending,
-                paging: paging
+                paging: paging,
+                limit: limit
             )
             
             query?.getDocuments() { (querySnapshot, err) in
                 if let err = err {
                     Logger.printLog("Error getting documents: \(err)")
                     continuation.resume(throwing: FirestoreError.document(err.localizedDescription))
+                    return
                 } else {
                     var list: [T] = []
                     for doc in querySnapshot!.documents {
@@ -214,12 +225,50 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                         } catch {
                             Logger.printLog("Error parsing documents: \(error)")
                             continuation.resume(throwing: FirestoreError.parsing)
+                            return
                         }
                     }
                     
                     let last = querySnapshot?.documents.last
                     
                     continuation.resume(returning: (list, last))
+                }
+            }
+        }
+    }
+    
+    public static func getDataInDay<T: Codable> (
+        collection: String,
+        date: Date,
+        dateField: String,
+        timeZone: TimeZone
+    ) async throws -> [T] {
+        
+        try await withCheckedThrowingContinuation { continuation in
+            
+            let db = Firestore.firestore()
+            let collectionRef = db.collection(collection)
+            let dateCollectionRef = collectionRef.whereField(dateField, isDateInTheDay: date, timeZone: timeZone)
+            
+            dateCollectionRef.getDocuments() { (querySnapshot, err) in
+                if let err = err {
+                    Logger.printLog("Error getting documents: \(err)")
+                    continuation.resume(throwing: FirestoreError.document(err.localizedDescription))
+                    return
+                } else {
+                    var list: [T] = []
+                    for doc in querySnapshot!.documents {
+                        do {
+                            let data = try doc.data(as: T.self)
+                            list.append(data)
+                        } catch {
+                            Logger.printLog("Error parsing documents: \(error)")
+                            continuation.resume(throwing: FirestoreError.parsing)
+                            return
+                        }
+                    }
+                    
+                    continuation.resume(returning: list)
                 }
             }
         }
@@ -274,7 +323,8 @@ extension FirestoreManager {
         whereFields: [(QueryType, String, Any)] = [],
         orderBy: String? = nil,
         descending: Bool? = true,
-        paging: Pagination? = nil
+        paging: Pagination? = nil,
+        limit: Int? = nil
     ) -> Query? {
         
         let db = Firestore.firestore()
@@ -301,11 +351,16 @@ extension FirestoreManager {
                     query = query?.whereField(whereField.1, isLessThanOrEqualTo: searchText + "\u{F7FF}")
                     query = query?.limit(to: 50)        // search limit : 50
                 }
+              
+            case .greaterThan:
+                query = query?.whereField(whereField.1, isGreaterThan: whereField.2)
             }
         }
         
         if let paging = paging {
             query = query?.limit(to: paging.limit ?? 20)
+        } else if let limit = limit {
+            query = query?.limit(to: limit)
         }
         
         if let orderBy = orderBy {

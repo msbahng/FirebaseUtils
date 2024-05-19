@@ -12,4 +12,5 @@ public enum QueryType {
     case notEqualTo
     case arrayContains
     case search
+    case greaterThan
 }
