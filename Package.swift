@@ -11,11 +11,18 @@ let package = Package(
         .library(
             name: "FirebaseUtils",
             targets: ["FirebaseUtils"]),
+        .library(
+            name: "FirebaseUiUtils",
+            targets: ["FirebaseUiUtils"]),
     ],
     dependencies: [
         .package(
             url:  "https://github.com/firebase/firebase-ios-sdk.git",
             .upToNextMajor(from: "10.0.0")
+        ),
+        .package(
+            url:  "https://github.com/firebase/FirebaseUI-iOS.git",
+            .upToNextMajor(from: "13.0.0")
         ),
         .package(
             url:  "git@github.com:msbahng/LoggeriOS.git",
@@ -24,7 +31,7 @@ let package = Package(
         ),
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
-            .exact("1.0.1")
+            .exact("1.1.0")
 //            path: "../CommonUtils"
         ),
     ],
@@ -37,8 +44,17 @@ let package = Package(
                 .product(name: "FirebaseStorage", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
                 .product(name: "Logger", package: "LoggeriOS"),
                 .product(name: "CommonUtils", package: "CommonUtils")
+            ]),
+        .target(
+            name: "FirebaseUiUtils",
+            dependencies: [
+                .product(name: "FirebaseAuthUI", package: "FirebaseUI-iOS"),
+                .product(name: "FirebaseGoogleAuthUI", package: "FirebaseUI-iOS"),
+                .product(name: "FirebaseOAuthUI", package: "FirebaseUI-iOS"),
+                .product(name: "FirebaseEmailAuthUI", package: "FirebaseUI-iOS")
             ]),
         .testTarget(
             name: "FirebaseUtilsTests",

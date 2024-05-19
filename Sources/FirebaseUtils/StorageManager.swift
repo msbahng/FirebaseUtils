@@ -10,6 +10,11 @@ import FirebaseStorage
 import Logger
 
 public protocol StorageManagerProtocol {
+    static func downloadFile(
+        remoteUrl: String,
+        localUrl: URL
+    ) async throws -> Void
+    
     func uploadFiles(
         files: [URL],
         folder: String,
@@ -23,6 +28,25 @@ public struct StorageManager: StorageManagerProtocol {
     
     private let imageStorageRef: StorageReference
     private let storageRef: StorageReference
+    
+    public static func downloadFile(
+        remoteUrl: String,
+        localUrl: URL
+    ) async throws -> Void {
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            
+            let storageRef = Storage.storage().reference(forURL: remoteUrl)
+            
+            let downloadTask = storageRef.write(toFile: localUrl) { url, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: Void())
+                }
+            }
+        }
+    }
     
     public init(storageUrl: String, path: String) {
         let storage = Storage.storage()
