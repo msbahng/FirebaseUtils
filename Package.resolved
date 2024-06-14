@@ -10,12 +10,30 @@
       }
     },
     {
+      "identity" : "appauth-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/openid/AppAuth-iOS.git",
+      "state" : {
+        "revision" : "c89ed571ae140f8eb1142735e6e23d7bb8c34cb2",
+        "version" : "1.7.5"
+      }
+    },
+    {
       "identity" : "commonutils",
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:msbahng/CommonUtils.git",
       "state" : {
-        "revision" : "d7c8d828b06208cc5ef97f76cd1873fa016239be",
-        "version" : "1.0.1"
+        "revision" : "44fad197454645c68f62ea1d0d8b3077294445b2",
+        "version" : "1.1.1"
+      }
+    },
+    {
+      "identity" : "facebook-ios-sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/facebook/facebook-ios-sdk.git",
+      "state" : {
+        "revision" : "3fe31c168903759de1c5752d12856c5c437c6862",
+        "version" : "16.3.1"
       }
     },
     {
@@ -25,6 +43,15 @@
       "state" : {
         "revision" : "df2171b0c6afb9e9d4f7e07669d558c510b9f6be",
         "version" : "10.13.0"
+      }
+    },
+    {
+      "identity" : "firebaseui-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/firebase/FirebaseUI-iOS.git",
+      "state" : {
+        "revision" : "6ed31d58929c0fa1b8ec7746244fc43247f4ddb1",
+        "version" : "13.2.0"
       }
     },
     {
@@ -43,6 +70,15 @@
       "state" : {
         "revision" : "aae45a320fd0d11811820335b1eabc8753902a40",
         "version" : "9.2.5"
+      }
+    },
+    {
+      "identity" : "googlesignin-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/GoogleSignIn-iOS",
+      "state" : {
+        "revision" : "9c9b36af86a4dd3da16048a36cf37351e63ccfe1",
+        "version" : "6.2.4"
       }
     },
     {
@@ -68,8 +104,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/gtm-session-fetcher.git",
       "state" : {
-        "revision" : "d415594121c9e8a4f9d79cecee0965cf35e74dbd",
-        "version" : "3.1.1"
+        "revision" : "5ccda3981422a84186387dbb763ba739178b529c",
+        "version" : "2.3.0"
+      }
+    },
+    {
+      "identity" : "gtmappauth",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/GTMAppAuth.git",
+      "state" : {
+        "revision" : "6dee0cde8a1b223737a5159e55e6b4ec16bbbdd9",
+        "version" : "1.3.1"
       }
     },
     {
@@ -106,6 +151,15 @@
       "state" : {
         "revision" : "e70e889c0196c76d22759eb50d6a0270ca9f1d9e",
         "version" : "2.3.1"
+      }
+    },
+    {
+      "identity" : "sdwebimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/SDWebImage.git",
+      "state" : {
+        "revision" : "b8523c1642f3c142b06dd98443ea7c48343a4dfd",
+        "version" : "5.19.3"
       }
     },
     {
