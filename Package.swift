@@ -26,12 +26,12 @@ let package = Package(
         ),
         .package(
             url:  "git@github.com:msbahng/LoggeriOS.git",
-            .exact("1.0.0")
+            .upToNextMinor(from: "1.0.0")
 //            path: "../LoggeriOS"
         ),
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
-            .exact("1.1.0")
+            .upToNextMinor(from: "1.1.1")
 //            path: "../CommonUtils"
         ),
     ],
