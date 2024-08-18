@@ -5,9 +5,9 @@
 //  Created by Mooseok Bahng on 2023/07/01.
 //
 
-import FirebaseFirestore
+@preconcurrency import FirebaseFirestore
 
-public struct Pagination {
+public struct Pagination: Sendable {
 
     public var limit: Int?
     public var noMoreData: Bool
