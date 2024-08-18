@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -31,7 +31,7 @@ let package = Package(
         ),
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
-            .upToNextMinor(from: "1.1.1")
+            .upToNextMinor(from: "1.2.0")
 //            path: "../CommonUtils"
         ),
     ],
@@ -47,6 +47,9 @@ let package = Package(
                 .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
                 .product(name: "Logger", package: "LoggeriOS"),
                 .product(name: "CommonUtils", package: "CommonUtils")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
             ]),
         .target(
             name: "FirebaseUiUtils",
@@ -55,9 +58,15 @@ let package = Package(
                 .product(name: "FirebaseGoogleAuthUI", package: "FirebaseUI-iOS"),
                 .product(name: "FirebaseOAuthUI", package: "FirebaseUI-iOS"),
                 .product(name: "FirebaseEmailAuthUI", package: "FirebaseUI-iOS")
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
             ]),
         .testTarget(
             name: "FirebaseUtilsTests",
-            dependencies: ["FirebaseUtils"]),
+            dependencies: ["FirebaseUtils"],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]),
     ]
 )

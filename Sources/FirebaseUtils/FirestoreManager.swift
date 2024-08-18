@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import FirebaseFirestore
+@preconcurrency import FirebaseFirestore
 import FirebaseFirestoreSwift
 import Logger
 import CommonUtils
@@ -58,7 +58,7 @@ public protocol FirestoreManagerProtocol {
         whereFields: [(QueryType, String, Any)]
     ) async throws -> Int
     
-    static func getDataFromDocumentRefs<T: Codable> (
+    static func getDataFromDocumentRefs<T: Codable & Sendable> (
         documentRefs: [DocumentReference]
     ) async throws -> [T]
     
@@ -297,7 +297,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
         }
     }
     
-    public static func getDataFromDocumentRefs<T: Codable> (
+    public static func getDataFromDocumentRefs<T: Codable & Sendable> (
         documentRefs: [DocumentReference]
     ) async throws -> [T] {
         

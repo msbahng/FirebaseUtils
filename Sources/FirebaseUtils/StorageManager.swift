@@ -38,7 +38,7 @@ public struct StorageManager: StorageManagerProtocol {
             
             let storageRef = Storage.storage().reference(forURL: remoteUrl)
             
-            let downloadTask = storageRef.write(toFile: localUrl) { url, error in
+            _ = storageRef.write(toFile: localUrl) { url, error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {
