@@ -25,13 +25,9 @@ let package = Package(
             .upToNextMajor(from: "13.0.0")
         ),
         .package(
-            url:  "git@github.com:msbahng/LoggeriOS.git",
-            .upToNextMinor(from: "1.0.0")
-//            path: "../LoggeriOS"
-        ),
-        .package(
             url: "git@github.com:msbahng/CommonUtils.git",
-            .upToNextMinor(from: "1.2.0")
+//            .upToNextMinor(from: "1.2.0")
+            branch: "develop"
 //            path: "../CommonUtils"
         ),
     ],
@@ -45,7 +41,7 @@ let package = Package(
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
-                .product(name: "Logger", package: "LoggeriOS"),
+                .product(name: "Logger", package: "CommonUtils"),
                 .product(name: "CommonUtils", package: "CommonUtils")
             ],
             swiftSettings: [

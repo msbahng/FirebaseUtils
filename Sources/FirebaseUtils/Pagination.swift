@@ -5,7 +5,7 @@
 //  Created by Mooseok Bahng on 2023/07/01.
 //
 
-@preconcurrency import FirebaseFirestore
+import FirebaseFirestore
 
 public struct Pagination: Sendable {
 

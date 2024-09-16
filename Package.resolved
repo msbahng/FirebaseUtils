@@ -1,4 +1,5 @@
 {
+  "originHash" : "9c09959114d2fcd3dbabdec423ee9396d91d79b7bdd77ffc438dc0ccb9c76e84",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -23,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:msbahng/CommonUtils.git",
       "state" : {
-        "revision" : "44fad197454645c68f62ea1d0d8b3077294445b2",
-        "version" : "1.1.1"
+        "branch" : "develop",
+        "revision" : "be6bd15915169bca92c287cce58aba57ec14fc26"
       }
     },
     {
@@ -127,15 +128,6 @@
       }
     },
     {
-      "identity" : "loggerios",
-      "kind" : "remoteSourceControl",
-      "location" : "git@github.com:msbahng/LoggeriOS.git",
-      "state" : {
-        "revision" : "08954426ebf246925eb1de44bf095c959f89f254",
-        "version" : "1.0.0"
-      }
-    },
-    {
       "identity" : "nanopb",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/nanopb.git",
@@ -172,5 +164,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

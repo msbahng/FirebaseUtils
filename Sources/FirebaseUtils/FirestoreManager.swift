@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@preconcurrency import FirebaseFirestore
+import FirebaseFirestore
 import FirebaseFirestoreSwift
 import Logger
 import CommonUtils
