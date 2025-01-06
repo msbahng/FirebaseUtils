@@ -22,7 +22,7 @@ let package = Package(
         ),
         .package(
             url:  "https://github.com/firebase/FirebaseUI-iOS.git",
-            .upToNextMajor(from: "13.0.0")
+            .upToNextMajor(from: "15.0.0")
         ),
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
