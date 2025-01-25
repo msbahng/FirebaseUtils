@@ -16,7 +16,6 @@ import Logger
     public var storageLoaderError: Error?
     public var isLoading: Bool = false
     
-    // not used for now
     public init(storageReferenceUrl: String, id: String) {
                 
         let storageRef = Self.getStorageReference(storageReferenceUrl: storageReferenceUrl, id: id)

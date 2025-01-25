@@ -18,20 +18,16 @@ let package = Package(
     dependencies: [
         .package(
             url:  "https://github.com/firebase/firebase-ios-sdk.git",
-            .upToNextMajor(from: "10.0.0")
+            .upToNextMajor(from: "11.5.0")
         ),
         .package(
             url:  "https://github.com/firebase/FirebaseUI-iOS.git",
-            .upToNextMajor(from: "13.0.0")
-        ),
-        .package(
-            url:  "git@github.com:msbahng/LoggeriOS.git",
-            .upToNextMinor(from: "1.0.0")
-//            path: "../LoggeriOS"
+            .upToNextMajor(from: "15.0.0")
         ),
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
-            .upToNextMinor(from: "1.2.0")
+            .upToNextMinor(from: "1.3.0")
+//            branch: "develop"
 //            path: "../CommonUtils"
         ),
     ],
@@ -43,9 +39,8 @@ let package = Package(
             dependencies: [
                 .product(name: "FirebaseStorage", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
-                .product(name: "Logger", package: "LoggeriOS"),
+                .product(name: "Logger", package: "CommonUtils"),
                 .product(name: "CommonUtils", package: "CommonUtils")
             ],
             swiftSettings: [
