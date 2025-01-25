@@ -101,8 +101,7 @@ public struct FirebaseUIView: UIViewControllerRepresentable {
             self.signInErrorMessage = signInErrorMessage
         }
         
-        public func authUI(_ authUI: FUIAuth, didSignInWith authDataResult: AuthDataResult?, error: Error?) {
-            
+        public func authUI(_ authUI: FUIAuth, didFinish operation: FUIAccountSettingsOperationType, error: (any Error)?) {
             guard let error = error else {
                 return
             }
