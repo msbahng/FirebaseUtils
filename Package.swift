@@ -26,8 +26,8 @@ let package = Package(
         ),
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
-//            .upToNextMinor(from: "1.2.0")
-            branch: "develop"
+            .upToNextMinor(from: "1.3.0")
+//            branch: "develop"
 //            path: "../CommonUtils"
         ),
     ],
@@ -39,7 +39,6 @@ let package = Package(
             dependencies: [
                 .product(name: "FirebaseStorage", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseFirestoreSwift", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
                 .product(name: "Logger", package: "CommonUtils"),
                 .product(name: "CommonUtils", package: "CommonUtils")
