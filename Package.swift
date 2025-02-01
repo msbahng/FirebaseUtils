@@ -43,6 +43,7 @@ let package = Package(
                 .product(name: "Logger", package: "CommonUtils"),
                 .product(name: "CommonUtils", package: "CommonUtils")
             ],
+            path: "Sources/FirebaseUtils",
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
             ]),
@@ -54,12 +55,14 @@ let package = Package(
                 .product(name: "FirebaseOAuthUI", package: "FirebaseUI-iOS"),
                 .product(name: "FirebaseEmailAuthUI", package: "FirebaseUI-iOS")
             ],
+            path: "Sources/FirebaseUiUtils",
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
             ]),
         .testTarget(
             name: "FirebaseUtilsTests",
             dependencies: ["FirebaseUtils"],
+            path: "Tests",
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
             ]),
