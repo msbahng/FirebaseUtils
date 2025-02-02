@@ -26,7 +26,7 @@ let package = Package(
         ),
         .package(
             url: "git@github.com:msbahng/CommonUtils.git",
-            .upToNextMinor(from: "1.3.0")
+            .upToNextMinor(from: "1.4.0")
 //            branch: "develop"
 //            path: "../CommonUtils"
         ),
