@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:msbahng/CommonUtils.git",
       "state" : {
-        "revision" : "af988368a0582393c4aaa0f9ce170a9e8193ef64",
-        "version" : "1.3.0"
+        "revision" : "16b00e34dd5bcf2f21ae9a65478617cdb8e816c0",
+        "version" : "1.4.0"
       }
     },
     {
