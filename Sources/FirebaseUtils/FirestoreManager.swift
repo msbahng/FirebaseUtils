@@ -7,8 +7,6 @@
 
 import Foundation
 import FirebaseFirestore
-import Logger
-import CommonUtils
 
 public protocol FirestoreManagerProtocol {
     
@@ -95,10 +93,10 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             do {
                 try ref.setData(from: data, merge: merge) { error in
                     if let error = error {
-                        Logger.printLog("Error adding document: \(error)")
+                        print("Error adding document: \(error)")
                         continuation.resume(throwing: FirestoreError.document(error.localizedDescription))
                     } else {
-                        Logger.printLog("Document set : \(document)")
+                        print("Document set : \(document)")
                         continuation.resume(returning: ref)
                     }
                 }
@@ -121,10 +119,10 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                 let db = Firestore.firestore()
                 ref = try db.collection(collection).addDocument(from: data) { error in
                     if let error = error {
-                        Logger.printLog("Error adding document: \(error)")
+                        print("Error adding document: \(error)")
                         continuation.resume(throwing: FirestoreError.document(error.localizedDescription))
                     } else {
-                        Logger.printLog("Document added with ID: \(ref!.documentID)")
+                        print("Document added with ID: \(ref!.documentID)")
                         continuation.resume(returning: ref!)
                     }
                 }
@@ -148,18 +146,18 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             documentRef.getDocument { (doc, error) in
                 if let doc = doc, doc.exists {
                     let dataDescription = doc.data().map(String.init(describing:)) ?? "nil"
-                    Logger.printLog("Document data: \(dataDescription)")
+                    print("Document data: \(dataDescription)")
                     
                     do {
                         let data = try doc.data(as: T.self)
                         continuation.resume(returning: data)
                     } catch {
-                        Logger.printLog("Error parsing documents: \(error)")
+                        print("Error parsing documents: \(error)")
                         continuation.resume(throwing: FirestoreError.parsing)
                     }
                     
                 } else {
-                    Logger.printLog("Document does not exist")
+                    print("Document does not exist")
                     continuation.resume(throwing: FirestoreError.document("Document does not exist."))
                 }
             }
@@ -179,10 +177,10 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             
             ref.delete() { error in
                 if let error = error {
-                    Logger.printLog("Error deleting document: \(error)")
+                    print("Error deleting document: \(error)")
                     continuation.resume(throwing: FirestoreError.document(error.localizedDescription))
                 } else {
-                    Logger.printLog("Document deleted")
+                    print("Document deleted")
                     continuation.resume(returning: true)
                 }
             }
@@ -211,18 +209,17 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             
             query?.getDocuments() { (querySnapshot, err) in
                 if let err = err {
-                    Logger.printLog("Error getting documents: \(err)")
+                    print("Error getting documents: \(err)")
                     continuation.resume(throwing: FirestoreError.document(err.localizedDescription))
                     return
                 } else {
                     var list: [T] = []
                     for doc in querySnapshot!.documents {
-//                        Logger.printLog("\(doc.documentID) => \(doc.data())")
                         do {
                             let data = try doc.data(as: T.self)
                             list.append(data)
                         } catch {
-                            Logger.printLog("Error parsing documents: \(error)")
+                            print("Error parsing documents: \(error)")
                             continuation.resume(throwing: FirestoreError.parsing)
                             return
                         }
@@ -251,7 +248,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             
             dateCollectionRef.getDocuments() { (querySnapshot, err) in
                 if let err = err {
-                    Logger.printLog("Error getting documents: \(err)")
+                    print("Error getting documents: \(err)")
                     continuation.resume(throwing: FirestoreError.document(err.localizedDescription))
                     return
                 } else {
@@ -261,7 +258,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
                             let data = try doc.data(as: T.self)
                             list.append(data)
                         } catch {
-                            Logger.printLog("Error parsing documents: \(error)")
+                            print("Error parsing documents: \(error)")
                             continuation.resume(throwing: FirestoreError.parsing)
                             return
                         }
@@ -287,7 +284,7 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             
             query?.getDocuments() { (querySnapshot, err) in
                 if let err = err {
-                    Logger.printLog("Error getting documents: \(err)")
+                    print("Error getting documents: \(err)")
                     continuation.resume(throwing: FirestoreError.document(err.localizedDescription))
                 } else {
                     continuation.resume(returning: querySnapshot?.count ?? 0)

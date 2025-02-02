@@ -7,9 +7,56 @@
 
 import FirebaseRemoteConfig
 import Foundation
-import CommonUtils
 
-public struct FetchedConfigValue {
+internal struct Version {
+    public let rawValue: String
+
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+}
+
+extension Version: Comparable {
+    static func splitByDot(_ versionNumber: String) -> [Int] {
+        versionNumber.split(separator: ".").map { Int($0) ?? 0 }
+    }
+
+    static func filled(_ target: [Int], count: Int) -> [Int] {
+        (0..<count).map { ($0 < target.count) ? target[$0] : 0 }
+    }
+
+    static func compare(lhs: Version, rhs: Version) -> ComparisonResult {
+        var left = splitByDot(lhs.rawValue)
+        var right = splitByDot(rhs.rawValue)
+
+        let count = max(left.count, right.count)
+        left = filled(left, count: count)
+        right = filled(right, count: count)
+
+        for index in 0..<count {
+            let lhsComponent = left[index]
+            let rhsComponent = right[index]
+
+            if lhsComponent < rhsComponent {
+                return .orderedDescending
+            }
+            if lhsComponent > rhsComponent {
+                return .orderedAscending
+            }
+        }
+        return .orderedSame
+    }
+
+    public static func == (lhs: Version, rhs: Version) -> Bool {
+        return compare(lhs: lhs, rhs: rhs) == .orderedSame
+    }
+
+    public static func < (lhs: Version, rhs: Version) -> Bool {
+        return compare(lhs: lhs, rhs: rhs) == .orderedDescending
+    }
+}
+
+struct FetchedConfigValue {
     public let isMaintenance: Bool
     public let forceUpdateVersion: Version
 }
@@ -25,7 +72,7 @@ enum RemoteConfigServiceError: Error {
     case other
 }
 
-public protocol FetchedConfigService {
+protocol FetchedConfigService {
     func fetch()
     func convert(_ value: FetchedConfigValue, currentVersion: Version) -> FetchConfigResult
 }
@@ -83,7 +130,7 @@ public protocol FetchedConfigService {
         }
     }
     
-    public func convert(_ value: FetchedConfigValue, currentVersion: Version) -> FetchConfigResult {
+    internal func convert(_ value: FetchedConfigValue, currentVersion: Version) -> FetchConfigResult {
         if value.isMaintenance {
             return .maintenance
         } else if value.forceUpdateVersion > currentVersion {

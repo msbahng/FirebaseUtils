@@ -7,7 +7,6 @@
 
 import SwiftUI
 import FirebaseStorage
-import Logger
 
 @Observable final public class StorageLoader {
     
@@ -22,7 +21,7 @@ import Logger
         
         storageRef.getData(maxSize: 1 * 1024 * 1024) { [weak self] data, error in
             if let error = error {
-                Logger.printLog("StorageLoader error : \(error)")
+                print("StorageLoader error : \(error)")
                 self?.storageLoaderError = error
             }
             
@@ -45,7 +44,7 @@ import Logger
         
         storageRef.write(toFile: localUrl) { [weak self] url, error in
             if let error = error {
-                Logger.printLog("StorageLoader error : \(error)")
+                print("StorageLoader error : \(error)")
                 self?.storageLoaderError = error
             }
             
