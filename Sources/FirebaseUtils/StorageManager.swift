@@ -7,7 +7,6 @@
 
 import Foundation
 import FirebaseStorage
-import Logger
 
 public protocol StorageManagerProtocol {
     static func downloadFile(

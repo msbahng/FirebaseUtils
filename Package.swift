@@ -24,12 +24,6 @@ let package = Package(
             url:  "https://github.com/firebase/FirebaseUI-iOS.git",
             .upToNextMajor(from: "15.0.0")
         ),
-        .package(
-            url: "git@github.com:msbahng/CommonUtils.git",
-            .upToNextMinor(from: "1.4.0")
-//            branch: "develop"
-//            path: "../CommonUtils"
-        ),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -39,9 +33,7 @@ let package = Package(
             dependencies: [
                 .product(name: "FirebaseStorage", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
-                .product(name: "Logger", package: "CommonUtils"),
-                .product(name: "CommonUtils", package: "CommonUtils")
+                .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk")
             ],
             path: "Sources/FirebaseUtils",
             swiftSettings: [
