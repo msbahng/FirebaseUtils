@@ -7,6 +7,7 @@
 
 import FirebaseFirestore
 
+nonisolated
 extension CollectionReference {
     
     public func whereField(_ field: String, isDateInTheDay date: Date, timeZone: TimeZone) -> Query {

@@ -15,24 +15,24 @@ public protocol FirestoreManagerProtocol {
         document: String
     ) -> DocumentReference
     
-    static func setDocument<T: Codable> (
+    static func setDocument<T: Codable & Sendable> (
         collection: String,
         document: String,
         data: T,
         merge: Bool
     ) async throws -> DocumentReference
     
-    static func setDocument<T: Codable> (
+    static func setDocument<T: Codable & Sendable> (
         collection: String,
         data: T
     ) async throws -> DocumentReference
     
-    static func getDocument<T: Codable> (
+    static func getDocument<T: Codable & Sendable> (
         collection: String,
         document: String
     ) async throws -> T
     
-    static func getDocument<T: Codable> (
+    static func getDocument<T: Codable & Sendable> (
         documentRef: DocumentReference
     ) async throws -> T
         
@@ -41,9 +41,9 @@ public protocol FirestoreManagerProtocol {
         document: String
     ) async throws -> Bool
     
-    static func getData<T: Codable> (
+    static func getData<T: Codable & Sendable> (
         collection: String,
-        whereFields: [(QueryType, String, Any)],
+        whereFields: [(QueryType, String, Sendable)],
         orderBy: String?,
         descending: Bool?,
         paging: Pagination?,
@@ -52,14 +52,14 @@ public protocol FirestoreManagerProtocol {
     
     static func getCount (
         collection: String,
-        whereFields: [(QueryType, String, Any)]
+        whereFields: [(QueryType, String, Sendable)]
     ) async throws -> Int
     
     static func getDataFromDocumentRefs<T: Codable & Sendable> (
         documentRefs: [DocumentReference]
     ) async throws -> [T]
     
-    static func getDataInDay<T: Codable> (
+    static func getDataInDay<T: Codable & Sendable> (
         collection: String,
         date: Date,
         dateField: String,
@@ -67,18 +67,19 @@ public protocol FirestoreManagerProtocol {
     ) async throws -> [T]
 }
 
+nonisolated
 public struct FirestoreManager: FirestoreManagerProtocol {
-    
-    public static func getReference (
+    nonisolated public static func getReference (
         collection: String,
         document: String
     ) -> DocumentReference {
         let db = Firestore.firestore()
         return db.collection(collection).document(document)
     }
-    
+
+    @concurrent
     @discardableResult
-    public static func setDocument<T: Codable> (
+    public static func setDocument<T: Codable & Sendable> (
         collection: String,
         document: String,
         data: T,
@@ -105,9 +106,10 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             }
         }
     }
-            
+
+    @concurrent
     @discardableResult
-    public static func setDocument<T: Codable> (
+    public static func setDocument<T: Codable & Sendable> (
         collection: String,
         data: T
     ) async throws -> DocumentReference {
@@ -131,16 +133,18 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             }
         }
     }
-    
-    public static func getDocument<T: Codable> (collection: String, document: String) async throws -> T {
-        
+
+    @concurrent
+    public static func getDocument<T: Codable & Sendable> (collection: String, document: String) async throws -> T {
+
         let db = Firestore.firestore()
         let docRef = db.collection(collection).document(document)
         return try await getDocument(documentRef: docRef)
     }
-    
-    public static func getDocument<T: Codable> (documentRef: DocumentReference) async throws -> T {
-        
+
+    @concurrent
+    public static func getDocument<T: Codable & Sendable> (documentRef: DocumentReference) async throws -> T {
+
         try await withCheckedThrowingContinuation { continuation in
             
             documentRef.getDocument { (doc, error) in
@@ -163,7 +167,8 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             }
         }
     }
-    
+
+    @concurrent
     @discardableResult
     public static func deleteDocument (
         collection: String,
@@ -186,10 +191,11 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             }
         }
     }
-    
-    public static func getData<T: Codable> (
+
+    @concurrent
+    public static func getData<T: Codable & Sendable> (
         collection: String,
-        whereFields: [(QueryType, String, Any)] = [],
+        whereFields: [(QueryType, String, Sendable)] = [],
         orderBy: String? = nil,
         descending: Bool? = true,
         paging: Pagination? = nil,
@@ -232,8 +238,9 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             }
         }
     }
-    
-    public static func getDataInDay<T: Codable> (
+
+    @concurrent
+    public static func getDataInDay<T: Codable & Sendable> (
         collection: String,
         date: Date,
         dateField: String,
@@ -269,10 +276,11 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             }
         }
     }
-    
+
+    @concurrent
     public static func getCount (
         collection: String,
-        whereFields: [(QueryType, String, Any)] = []
+        whereFields: [(QueryType, String, Sendable)] = []
     ) async throws -> Int {
         
         try await withCheckedThrowingContinuation { continuation in
@@ -292,7 +300,8 @@ public struct FirestoreManager: FirestoreManagerProtocol {
             }
         }
     }
-    
+
+    @concurrent
     public static func getDataFromDocumentRefs<T: Codable & Sendable> (
         documentRefs: [DocumentReference]
     ) async throws -> [T] {
@@ -312,8 +321,8 @@ public struct FirestoreManager: FirestoreManagerProtocol {
     }
 }
 
+nonisolated
 extension FirestoreManager {
-    
     private static func getQuery(
         collection: String,
         whereFields: [(QueryType, String, Any)] = [],

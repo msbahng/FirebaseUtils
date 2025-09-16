@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -37,7 +37,10 @@ let package = Package(
             ],
             path: "Sources/FirebaseUtils",
             swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances"),
+                .defaultIsolation(MainActor.self)
             ]),
         .target(
             name: "FirebaseUiUtils",
@@ -49,7 +52,10 @@ let package = Package(
             ],
             path: "Sources/FirebaseUiUtils",
             swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency")
+                .enableUpcomingFeature("StrictConcurrency"),
+                .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+                .enableUpcomingFeature("InferIsolatedConformances"),
+                .defaultIsolation(MainActor.self)
             ]),
         .testTarget(
             name: "FirebaseUtilsTests",
