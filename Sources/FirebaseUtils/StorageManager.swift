@@ -17,17 +17,19 @@ public protocol StorageManagerProtocol {
     func uploadFiles(
         files: [URL],
         folder: String,
-        onProgress: ((Float) -> Void)?
+        onProgress: (@Sendable (Float) -> Void)?
     ) async throws -> [String]
     
     func deleteFile(_ firebaseFile: String) async throws
 }
 
+nonisolated
 public struct StorageManager: StorageManagerProtocol {
-    
+
     private let imageStorageRef: StorageReference
     private let storageRef: StorageReference
-    
+
+    @concurrent
     public static func downloadFile(
         remoteUrl: String,
         localUrl: URL
@@ -52,11 +54,12 @@ public struct StorageManager: StorageManagerProtocol {
         storageRef = storage.reference(forURL: storageUrl)
         imageStorageRef = storageRef.child(path)
     }
-    
+
+    @concurrent
     public func uploadFiles(
         files: [URL],
         folder: String,
-        onProgress: ((Float) -> Void)? = nil
+        onProgress: (@Sendable (Float) -> Void)? = nil
     ) async throws -> [String] {
         
         guard files.count > 0 else {
@@ -84,7 +87,8 @@ public struct StorageManager: StorageManagerProtocol {
         
         return names
     }
-    
+
+    @concurrent
     public func deleteFile(_ firebaseFile: String) async throws {
         
         let fileRef = storageRef.child(firebaseFile)
@@ -92,8 +96,9 @@ public struct StorageManager: StorageManagerProtocol {
     }
 }
 
+nonisolated
 extension StorageManager {
-    
+    @concurrent
     private func processFile(
         file: URL,
         storageRef: StorageReference,
